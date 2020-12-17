@@ -14,7 +14,7 @@ allprojects {
 }
 
 // step2. add the library in your app module
-implementation 'com.github.seagazer:parallaxdecoration:1.0.0'
+implementation 'com.github.seagazer:parallaxdecoration:latestVersion'
 
 // step3. create a parallaxdecoration for your recyclerView
 private val bgs = intArrayOf(
