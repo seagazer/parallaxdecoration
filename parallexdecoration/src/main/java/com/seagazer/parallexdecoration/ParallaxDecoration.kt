@@ -22,6 +22,7 @@ open class ParallaxDecoration(private val context: Context) : RecyclerView.ItemD
     private var screenWidth = 0
     private var screenHeight = 0
     private var maxVisibleCount = 0
+    private var minVisibleCount = 0
     private var bitmapWidth = 0
     private var bitmapHeight = 0
     private var bitmapCount = 0
@@ -114,26 +115,28 @@ open class ParallaxDecoration(private val context: Context) : RecyclerView.ItemD
             isHorizontal = lm.canScrollHorizontally()
             // step2. check maxVisible count
             // step3. if autoFill, calculate the scale bitmap size
-            if (isHorizontal && screenWidth == 0) {
+            if (screenWidth == 0 || screenHeight == 0) {
                 screenWidth = c.width
                 screenHeight = c.height
-                if (autoFill) {
-                    scale = screenHeight * 1f / bitmapHeight
-                    scaleBitmapWidth = (bitmapWidth * scale).toInt()
+                val allInScreen: Int
+                val doubleOutOfScreen: Boolean
+                if (isHorizontal) {
+                    if (autoFill) {
+                        scale = screenHeight * 1f / bitmapHeight
+                        scaleBitmapWidth = (bitmapWidth * scale).toInt()
+                    }
+                    allInScreen = screenWidth / scaleBitmapWidth
+                    doubleOutOfScreen = screenWidth % scaleBitmapWidth > 1
+                } else {
+                    if (autoFill) {
+                        scale = screenWidth * 1f / bitmapWidth
+                        scaleBitmapHeight = (bitmapHeight * scale).toInt()
+                    }
+                    allInScreen = screenHeight / scaleBitmapHeight
+                    doubleOutOfScreen = screenHeight % scaleBitmapHeight > 1
                 }
-                val allInScreen = screenWidth / scaleBitmapWidth
-                val outOfScreen = screenWidth % scaleBitmapWidth > 1
-                maxVisibleCount = if (outOfScreen) allInScreen + 2 else allInScreen + 1
-            } else if (!isHorizontal && screenHeight == 0) {
-                screenWidth = c.width
-                screenHeight = c.height
-                if (autoFill) {
-                    scale = screenWidth * 1f / bitmapWidth
-                    scaleBitmapHeight = (bitmapHeight * scale).toInt()
-                }
-                val allInScreen = screenHeight / scaleBitmapHeight
-                val outOfScreen = screenHeight % scaleBitmapHeight > 1
-                maxVisibleCount = if (outOfScreen) allInScreen + 2 else allInScreen + 1
+                minVisibleCount = allInScreen + 1
+                maxVisibleCount = if (doubleOutOfScreen) allInScreen + 2 else minVisibleCount
             }
             // step4. find the firstVisible index
             // step5. calculate the firstVisible offset
@@ -151,7 +154,7 @@ open class ParallaxDecoration(private val context: Context) : RecyclerView.ItemD
             }
             // step6. calculate the best draw count
             val bestDrawCount =
-                if (firstVisibleOffset.toInt() == 0) maxVisibleCount - 1 else maxVisibleCount
+                if (firstVisibleOffset.toInt() == 0) minVisibleCount else maxVisibleCount
             // step7. translate to firstVisible offset
             c.save()
             if (isHorizontal) {
