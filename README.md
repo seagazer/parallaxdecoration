@@ -37,3 +37,5 @@ recycler_view.addItemDecoration(parallaxItemDecoration)
 <td><center><img src="https://upload-images.jianshu.io/upload_images/4420407-b462f8b3c11d9430.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/240"/></center></td>
 </tr>
 </table>
+
+设计原理及使用场景见：https://juejin.cn/post/6903790262183526408
